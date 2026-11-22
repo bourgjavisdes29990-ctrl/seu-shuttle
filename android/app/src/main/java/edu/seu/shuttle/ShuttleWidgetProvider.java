@@ -201,45 +201,77 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
         ScheduleData.Bus bus2 = null;
         ScheduleData.Bus bus3 = null;
 
+        // Check if currently inside a continuous cycle
+        ScheduleData.Bus activeCycle = null;
         for (ScheduleData.Bus b : buses) {
-            if (b.getMinutes() > currentMinute) {
-                if (nextBus == null) {
-                    nextBus = b;
-                } else if (bus2 == null) {
-                    bus2 = b;
-                } else if (bus3 == null) {
-                    bus3 = b;
-                    break;
+            if (b.isCycle && currentMinute >= b.startMin && currentMinute < b.endMin) {
+                activeCycle = b;
+                break;
+            }
+        }
+
+        if (activeCycle != null) {
+            nextBus = activeCycle;
+            for (ScheduleData.Bus b : buses) {
+                if (!b.isCycle && b.getMinutes() > currentMinute) {
+                    if (bus2 == null) {
+                        bus2 = b;
+                    } else if (bus3 == null) {
+                        bus3 = b;
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (ScheduleData.Bus b : buses) {
+                if (b.getMinutes() > currentMinute) {
+                    if (nextBus == null) {
+                        nextBus = b;
+                    } else if (bus2 == null) {
+                        bus2 = b;
+                    } else if (bus3 == null) {
+                        bus3 = b;
+                        break;
+                    }
                 }
             }
         }
 
         if (nextBus != null) {
-            int diff = nextBus.getMinutes() - currentMinute;
-            views.setTextViewText(R.id.tv_next_time, nextBus.time);
-
-            // Countdown styling
-            String cdText;
-            int cdColor;
-            if (diff <= 5) {
-                cdText = "⚡ 快跑！还有 " + diff + " 分钟";
-                cdColor = Color.parseColor("#ef4444"); // Red
-            } else if (diff <= 15) {
-                cdText = "🏃 抓紧！还有 " + diff + " 分钟";
-                cdColor = Color.parseColor("#f59e0b"); // Orange
+            if (nextBus.isCycle && currentMinute >= nextBus.startMin && currentMinute < nextBus.endMin) {
+                views.setTextViewText(R.id.tv_next_time, "循环发车");
+                views.setTextViewText(R.id.tv_countdown, "🔄 早高峰循环发车中");
+                views.setTextColor(R.id.tv_countdown, Color.parseColor("#38bdf8"));
             } else {
-                cdText = "☕ 还有 " + diff + " 分钟";
-                cdColor = Color.parseColor("#22c55e"); // Green
+                int diff = nextBus.getMinutes() - currentMinute;
+                views.setTextViewText(R.id.tv_next_time, nextBus.time);
+
+                // Countdown styling
+                String cdText;
+                int cdColor;
+                if (diff <= 5) {
+                    cdText = "⚡ 快跑！还有 " + diff + " 分钟";
+                    cdColor = Color.parseColor("#ef4444"); // Red
+                } else if (diff <= 15) {
+                    cdText = "🏃 抓紧！还有 " + diff + " 分钟";
+                    cdColor = Color.parseColor("#f59e0b"); // Orange
+                } else {
+                    cdText = "☕ 还有 " + diff + " 分钟";
+                    cdColor = Color.parseColor("#22c55e"); // Green
+                }
+                views.setTextViewText(R.id.tv_countdown, cdText);
+                views.setTextColor(R.id.tv_countdown, cdColor);
             }
-            views.setTextViewText(R.id.tv_countdown, cdText);
-            views.setTextColor(R.id.tv_countdown, cdColor);
 
             views.setTextViewText(R.id.tv_route_title, nextBus.route);
 
-            // Teaching line tag
-            if (nextBus.isTeaching) {
+            // Teaching line & warning tag
+            if (nextBus.note != null && nextBus.note.contains("不确定")) {
                 views.setViewVisibility(R.id.tv_tag_teaching, View.VISIBLE);
-                views.setTextViewText(R.id.tv_tag_teaching, "📚 直达纪忠楼专线");
+                views.setTextViewText(R.id.tv_tag_teaching, "⚠️ 附中放学·时间不确定");
+            } else if (nextBus.isTeaching) {
+                views.setViewVisibility(R.id.tv_tag_teaching, View.VISIBLE);
+                views.setTextViewText(R.id.tv_tag_teaching, nextBus.isCycle ? "🔄 循环发车·到纪忠楼" : "📚 直达纪忠楼专线");
             } else {
                 views.setViewVisibility(R.id.tv_tag_teaching, View.GONE);
             }
