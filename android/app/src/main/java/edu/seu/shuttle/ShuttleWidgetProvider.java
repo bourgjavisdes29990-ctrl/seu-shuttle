@@ -256,7 +256,7 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
             views.setTextColor(R.id.tv_countdown, Color.parseColor("#94a3b8"));
             if (onlyJizhong) {
                 views.setTextViewText(R.id.tv_route_title, toSchool ? "今日已无纪忠楼直达车" : "今日已无纪忠楼发车班次");
-                views.setTextViewText(R.id.tv_upcoming, toSchool ? "首班专线 07:30" : "首班专线 10:50");
+                views.setTextViewText(R.id.tv_upcoming, toSchool ? "首班专线 07:20" : "首班专线 07:30");
             } else {
                 views.setTextViewText(R.id.tv_route_title, toSchool ? "明天早点出发" : "已无回宿舍班次");
                 views.setTextViewText(R.id.tv_upcoming, "首班车 07:20 发车");

@@ -77,6 +77,25 @@
     .main-tab.lantai-tab.active { border-color:var(--lantai); background:var(--lantai-bg); color:var(--lantai); }
     .main-tab.campus-tab.active { border-color:var(--campus); background:var(--campus-bg); color:var(--campus); }
 
+    /* ===== Day Type Toggle ===== */
+    .day-row { display:flex; gap:6px; padding:6px 16px 2px; }
+    .day-btn {
+      flex:1; padding:7px 8px; border-radius:10px;
+      border:1px solid var(--border); background:rgba(255,255,255,0.03);
+      color:var(--text-muted); font-size:12px; font-weight:600;
+      text-align:center; cursor:pointer; transition:all 0.2s;
+      display:flex; align-items:center; justify-content:center; gap:5px;
+    }
+    .day-btn.active {
+      border-color:var(--primary); background:rgba(59,130,246,0.15); color:var(--primary-light);
+    }
+    .day-btn .badge-pill {
+      font-size:9px; padding:1px 5px; border-radius:6px; background:rgba(255,255,255,0.1);
+    }
+    .day-btn.active .badge-pill {
+      background:rgba(59,130,246,0.3); color:#fff;
+    }
+
     /* ===== Direction Toggle ===== */
     .dir-row { display:flex; gap:6px; padding:10px 16px; }
     .dir-btn {
@@ -228,21 +247,21 @@ const LANTAI = {
   weekday: {
     toSchool: [
       // 早间段 兰台→北门转盘→纪忠楼 循环 07:20-09:40
-      { time:"07:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"07:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"2辆车" },
-      { time:"07:40", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间" },
-      { time:"07:50", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:30", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"08:50", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"09:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"09:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"09:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"09:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"2辆车" },
-      { time:"09:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"07:20", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"07:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"准点发车(2辆车)" },
+      { time:"07:40", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"准点发车" },
+      { time:"07:50", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:00", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:10", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:20", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:40", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:50", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:00", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:10", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:20", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"准点发车(2辆车)" },
+      { time:"09:40", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"循环发车" },
       // 平峰段 常规 兰台→北门转盘
       { time:"10:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
       { time:"10:20", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
@@ -300,21 +319,21 @@ const LANTAI = {
     ],
     toHome: [
       // 早间段 纪忠楼→北门→兰台 循环发车 07:30-09:50
-      { time:"07:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"07:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"07:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:00", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:10", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:20", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"08:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:00", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:10", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:20", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
-      { time:"09:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间" },
+      { time:"07:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"07:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"07:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:00", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:10", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:20", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"08:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:00", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:10", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:20", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:30", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:40", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
+      { time:"09:50", route:"纪忠楼 → 北门 → 兰台", type:"teaching", period:"早间", note:"循环发车" },
       // 平峰段 常规
       { time:"10:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
       { time:"10:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
@@ -596,6 +615,7 @@ const CAMPUS_RESTRICTED = [
 //  STATE
 // =====================================================================
 let mainTab = 'lantai';
+let currentDay = isWE() ? 'weekend' : 'weekday';
 let lantaiDir = 'toSchool'; // toSchool / toHome
 let lantaiFilter = 'all';   // all / teaching / regular
 let icDir = 'to9';          // to9 / from9
@@ -606,6 +626,12 @@ let icDir = 'to9';          // to9 / from9
 function tm(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
 function nowM() { const d=new Date(); return d.getHours()*60+d.getMinutes(); }
 function isWE() { const d=new Date().getDay(); return d===0||d===6; }
+
+function setDayType(d) {
+  currentDay = d;
+  renderSub();
+  render();
+}
 
 function updateClock() {
   const n=new Date();
@@ -656,6 +682,14 @@ function renderSub() {
   const el = document.getElementById('subControls');
   if (mainTab === 'lantai') {
     el.innerHTML = `
+      <div class="day-row">
+        <div class="day-btn ${currentDay==='weekday'?'active':''}" onclick="setDayType('weekday')">
+          💼 工作日时刻 ${!isWE()?'<span class="badge-pill">今天</span>':''}
+        </div>
+        <div class="day-btn ${currentDay==='weekend'?'active':''}" onclick="setDayType('weekend')">
+          🏖️ 休息日时刻 ${isWE()?'<span class="badge-pill">今天</span>':''}
+        </div>
+      </div>
       <div class="dir-row">
         <div class="dir-btn ${lantaiDir==='toSchool'?'active':''}" onclick="setLantaiDir('toSchool')">
           <span class="arrow">→</span>去上课
@@ -683,6 +717,14 @@ function renderSub() {
     `;
   } else {
     el.innerHTML = `
+      <div class="day-row">
+        <div class="day-btn ${currentDay==='weekday'?'active':''}" onclick="setDayType('weekday')">
+          💼 工作日时刻 ${!isWE()?'<span class="badge-pill">今天</span>':''}
+        </div>
+        <div class="day-btn ${currentDay==='weekend'?'active':''}" onclick="setDayType('weekend')">
+          🏖️ 休息日时刻 ${isWE()?'<span class="badge-pill">今天</span>':''}
+        </div>
+      </div>
       <div class="info-banner" style="margin:8px 16px;">
         🔄 图书馆北（中央大道）发车，二环循环运行<br>
         早高峰东北门处约5-8分钟一趟，坐满即走
@@ -707,13 +749,14 @@ function render() {
 function renderLantai() {
   const c = document.getElementById('content');
   const now = nowM();
-  const dayType = isWE() ? 'weekend' : 'weekday';
+  const dayType = currentDay;
+  const isToday = (currentDay === (isWE() ? 'weekend' : 'weekday'));
   let items = LANTAI[dayType][lantaiDir];
 
   if (lantaiFilter === 'teaching') items = items.filter(i => i.type === 'teaching');
   else if (lantaiFilter === 'regular') items = items.filter(i => i.type === 'regular');
 
-  const next = items.find(i => tm(i.time) > now);
+  const next = isToday ? items.find(i => tm(i.time) > now) : null;
   const next2 = next ? items.find(i => i !== next && tm(i.time) > now) : null;
 
   let html = '';
@@ -724,7 +767,7 @@ function renderLantai() {
     const u = urgency(diff);
     html += `
       <div class="hero lantai-hero">
-        <div class="hero-label">⏱ ${lantaiDir==='toSchool'?'最近去上课':'最近回宿舍'}</div>
+        <div class="hero-label">⏱ ${lantaiDir==='toSchool'?'最近去上课':'最近回宿舍'} · <span style="font-size:11px;opacity:0.85;">${dayType==='weekday'?'工作日':'休息日'}</span></div>
         <div class="hero-time">${next.time}</div>
         <div class="hero-route">${next.route}</div>
         <div class="hero-countdown ${u.cls}">${u.txt} 还有 ${diff} 分钟</div>
@@ -733,15 +776,54 @@ function renderLantai() {
         ${next2?`<div class="hero-next-hint">再下一班：${next2.time}（${next2.route}）${next2.type==='teaching'?' · 教学专线':''}</div>`:''}
       </div>
     `;
+  } else if (!isToday) {
+    const firstBus = items[0];
+    html += `
+      <div class="hero lantai-hero" style="background:linear-gradient(135deg, rgba(56,189,248,0.15), rgba(99,102,241,0.1));">
+        <div class="hero-label">📅 ${dayType==='weekday'?'【工作日】时刻表预览':'【休息日】时刻表预览'}</div>
+        <div class="hero-time" style="font-size:22px;margin:6px 0;">${items.length ? `共 ${items.length} 个班次` : '该筛选无班次'}</div>
+        <div class="hero-route">${firstBus ? `首班车：${firstBus.time}（${firstBus.route}）` : '节假日无对应路线'}</div>
+        <div style="font-size:12px;color:var(--primary-light);margin-top:6px;">👇 可在下方列表查看详细时刻与路线</div>
+      </div>
+    `;
   } else {
     html += `<div class="no-bus"><div class="emoji">😴</div><div class="msg">今天没有更多班次了<br>明天早点来吧！</div></div>`;
   }
 
+  // 节假日纪忠楼专线特别说明
+  if (dayType === 'weekend' && lantaiFilter === 'teaching') {
+    if (lantaiDir === 'toHome') {
+      html += `
+        <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:14px;padding:16px;margin:12px 0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:20px;">ℹ️</span>
+            <span style="font-weight:700;color:var(--teaching);font-size:14px;">节假日官方无纪忠楼直达返程专线</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">
+            根据东南大学总务处时刻表，<b>双休日及节假日返程接驳车全部仅由【北门转盘】发车返回兰台</b>，不经停纪忠楼。<br>
+            • 如需回宿舍，请点击上方<b>【全部班次】</b>乘坐北门发车班次；<br>
+            • 如需查看周一至周五的纪忠楼返程专线时刻，请点击上方<b>【💼 工作日时刻】</b>查看。
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button onclick="setDayType('weekday')" style="padding:6px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">查看工作日返程 (26班)</button>
+            <button onclick="setLantaiFilter('all')" style="padding:6px 14px;background:rgba(255,255,255,0.08);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;">查看节假日全部班次</button>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:12px;color:var(--text-muted);line-height:1.6;">
+          💡 <b>节假日说明</b>：双休日及节假日兰台直达纪忠楼仅 <b>07:40</b> 一班专线。其余时间请乘坐常规线至北门转盘后转乘或步行。如需查看周一至周五的纪忠楼专线（共25班），请点击上方<b>【💼 工作日时刻】</b>。
+        </div>
+      `;
+    }
+  }
+
   // List
-  html += '<div class="section-title">📋 全部班次</div>';
+  html += `<div class="section-title">📋 ${dayType==='weekday'?'工作日':'节假日'} · 全部班次（共 ${items.length} 班）</div>`;
   let lastP = '';
   items.forEach(item => {
-    const m = tm(item.time), passed = m <= now;
+    const m = tm(item.time), passed = isToday && m <= now;
     const isN = next && item === next;
     const diff = m - now;
     if (item.period !== lastP) {
@@ -751,7 +833,7 @@ function renderLantai() {
     let cls = 'bus'; if(passed)cls+=' passed'; if(isN)cls+=' next';
     let tags = '';
     if(item.type==='teaching') tags+='<span class="tag teaching">📚 教学专线</span>';
-    if(item.note) tags+=`<span class="tag note-tag">⚠️</span>`;
+    if(item.note) tags+=`<span class="tag note-tag">⚠️ ${item.note}</span>`;
 
     html += `<div class="${cls}">
       <div class="bus-time">${item.time}</div>
@@ -759,18 +841,24 @@ function renderLantai() {
         <div class="bus-route">${item.route}</div>
         <div class="bus-tags">${tags}</div>
       </div>
-      ${countdownHtml(diff)}
+      ${isToday ? countdownHtml(diff) : '<span class="bus-status" style="color:var(--text-dim)">准点</span>'}
     </div>`;
   });
-  if (!items.length) html += `<div class="no-bus"><div class="emoji">🔍</div><div class="msg">该筛选下没有班次</div></div>`;
+  if (!items.length) {
+    if (!(dayType === 'weekend' && lantaiFilter === 'teaching' && lantaiDir === 'toHome')) {
+      html += `<div class="no-bus"><div class="emoji">🔍</div><div class="msg">该筛选下没有班次</div></div>`;
+    }
+  }
   c.innerHTML = html;
 }
 
 function renderCampus() {
   const c = document.getElementById('content');
   const now = nowM();
-  const times = isWE() ? CAMPUS_BUS.weekend : CAMPUS_BUS.weekday;
-  const next = times.find(t => tm(t) > now);
+  const dayType = currentDay;
+  const isToday = (currentDay === (isWE() ? 'weekend' : 'weekday'));
+  const times = CAMPUS_BUS[dayType];
+  const next = isToday ? times.find(t => tm(t) > now) : null;
   const next2 = next ? times.find(t => t !== next && tm(t) > now) : null;
 
   let html = '';
@@ -784,7 +872,7 @@ function renderCampus() {
     }
     html += `
       <div class="hero">
-        <div class="hero-label">⏱ 下一班校园巴士（图书馆北发车）</div>
+        <div class="hero-label">⏱ 下一班校园巴士（图书馆北发车）· <span style="font-size:11px;opacity:0.85;">${dayType==='weekday'?'工作日':'休息日'}</span></div>
         <div class="hero-time">${next}</div>
         <div class="hero-route">图书馆北（中央大道）→ 二环循环</div>
         <div class="hero-countdown ${u.cls}">${u.txt} 还有 ${diff} 分钟</div>
@@ -792,15 +880,24 @@ function renderCampus() {
         ${next2?`<div class="hero-next-hint">再下一班：${next2}</div>`:''}
       </div>
     `;
+  } else if (!isToday) {
+    html += `
+      <div class="hero" style="background:linear-gradient(135deg, rgba(52,211,153,0.15), rgba(59,130,246,0.1));">
+        <div class="hero-label">📅 ${dayType==='weekday'?'【工作日】校园巴士预览':'【休息日】校园巴士预览'}</div>
+        <div class="hero-time" style="font-size:22px;margin:6px 0;">全天共 ${times.length} 班次</div>
+        <div class="hero-route">首班车：${times[0]} · 末班车：${times[times.length-1]}</div>
+        <div style="font-size:12px;color:var(--campus);margin-top:6px;">👇 可在下方列表查看完整时刻</div>
+      </div>
+    `;
   } else {
     html += `<div class="no-bus"><div class="emoji">😴</div><div class="msg">今天没有更多校园巴士了</div></div>`;
   }
 
-  html += '<div class="section-title">📋 全天班次（图书馆北发车）</div>';
+  html += `<div class="section-title">📋 ${dayType==='weekday'?'工作日':'节假日'} · 全天班次（共 ${times.length} 班）</div>`;
   let lastH = -1;
   times.forEach(t => {
-    const m = tm(t), passed = m <= now;
-    const isN = t === next, diff = m - now;
+    const m = tm(t), passed = isToday && m <= now;
+    const isN = next && t === next, diff = m - now;
     const h = Math.floor(m / 60);
     if (h !== lastH) {
       html += `<div class="period-div">${h < 12 ? '🌅' : h < 18 ? '☀️' : '🌙'} ${h}:00 时段</div>`;
@@ -816,7 +913,7 @@ function renderCampus() {
         <div class="bus-route">图书馆北 → 二环循环</div>
         <div class="bus-tags">${tags}</div>
       </div>
-      ${countdownHtml(diff)}
+      ${isToday ? countdownHtml(diff) : '<span class="bus-status" style="color:var(--text-dim)">准点</span>'}
     </div>`;
   });
   c.innerHTML = html;
