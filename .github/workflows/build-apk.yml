@@ -24,15 +24,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.5'
+          gradle-version: '8.1.1'
 
       - name: Build Debug APK
         working-directory: ./android
         run: |
-          gradle assembleDebug --stacktrace
+          gradle assembleDebug
 
       - name: Rename APK
         run: |
@@ -43,13 +46,3 @@ jobs:
         with:
           name: seu-shuttle-widget
           path: seu-shuttle-widget.apk
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        continue-on-error: true
-        with:
-          tag_name: v1.0.0
-          name: "东大兰台接驳车桌面卡片 v1.0"
-          files: seu-shuttle-widget.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

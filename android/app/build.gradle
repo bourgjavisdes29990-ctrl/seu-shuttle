@@ -1,15 +1,13 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
 
 android {
     namespace 'edu.seu.shuttle'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "edu.seu.shuttle"
         minSdk 26
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
     }
