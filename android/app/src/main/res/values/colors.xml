@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_card">#1e293b</color>
+    <color name="text_primary">#f8fafc</color>
+    <color name="text_secondary">#94a3b8</color>
+    <color name="accent_pink">#f472b6</color>
+    <color name="accent_blue">#60a5fa</color>
+    <color name="btn_bg">#334155</color>
+    <color name="badge_soon">#ef4444</color>
+    <color name="badge_ok">#22c55e</color>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">东大接驳车</string>
+    <string name="widget_desc">兰台宿舍接驳车实时班次与倒计时卡片</string>
+</resources>
