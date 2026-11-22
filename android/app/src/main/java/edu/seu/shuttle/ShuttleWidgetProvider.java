@@ -1,5 +1,6 @@
 package edu.seu.shuttle;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -7,9 +8,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.view.View;
 import android.widget.RemoteViews;
+
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,6 +30,16 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
     private static final String PREFS_NAME = "shuttle_widget_prefs";
     private static final String KEY_TO_SCHOOL = "key_to_school";
     private static final String KEY_ONLY_JIZHONG = "key_only_jizhong";
+    private static final String KEY_OVERRIDE_TIME = "key_override_time";
+
+    // 坐标常量 (WGS84 / GCJ-02 大致范围)
+    // 兰台研究生公寓 (兰台街附近): 31.8999° N, 118.8223° E
+    private static final double LAT_LANTAI = 31.8999;
+    private static final double LNG_LANTAI = 118.8223;
+
+    // 九龙湖教学区/校区中心: 31.8873° N, 118.8209° E
+    private static final double LAT_CAMPUS = 31.8873;
+    private static final double LNG_CAMPUS = 118.8209;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -39,7 +55,10 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
         if (ACTION_TOGGLE_DIR.equals(intent.getAction())) {
             SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             boolean toSchool = prefs.getBoolean(KEY_TO_SCHOOL, true);
-            prefs.edit().putBoolean(KEY_TO_SCHOOL, !toSchool).apply();
+            prefs.edit()
+                 .putBoolean(KEY_TO_SCHOOL, !toSchool)
+                 .putLong(KEY_OVERRIDE_TIME, System.currentTimeMillis())
+                 .apply();
             updateAllWidgets(context);
         } else if (ACTION_TOGGLE_JIZHONG.equals(intent.getAction())) {
             SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -61,15 +80,65 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    private static Boolean determineDirectionByLocation(Context context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+
+        try {
+            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            if (lm == null) return null;
+
+            Location bestLocation = null;
+            List<String> providers = lm.getProviders(true);
+            for (String provider : providers) {
+                try {
+                    Location l = lm.getLastKnownLocation(provider);
+                    if (l != null) {
+                        if (bestLocation == null || l.getTime() > bestLocation.getTime()) {
+                            bestLocation = l;
+                        }
+                    }
+                } catch (SecurityException ignored) {}
+            }
+
+            if (bestLocation != null) {
+                float[] distLantai = new float[1];
+                float[] distCampus = new float[1];
+                Location.distanceBetween(bestLocation.getLatitude(), bestLocation.getLongitude(), LAT_LANTAI, LNG_LANTAI, distLantai);
+                Location.distanceBetween(bestLocation.getLatitude(), bestLocation.getLongitude(), LAT_CAMPUS, LNG_CAMPUS, distCampus);
+
+                // 如果距离兰台更近 -> 去上课 (true)；如果距离九龙湖更近 -> 回宿舍 (false)
+                return distLantai[0] <= distCampus[0];
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
     private static void updateWidget(Context context, AppWidgetManager manager, int widgetId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        boolean toSchool = prefs.getBoolean(KEY_TO_SCHOOL, true);
         boolean onlyJizhong = prefs.getBoolean(KEY_ONLY_JIZHONG, false);
+
+        // 判断当前方向：优先智能定位判断（如果最近没有手动强行覆盖）
+        boolean toSchool;
+        boolean isGpsDetermined = false;
+        long overrideTime = prefs.getLong(KEY_OVERRIDE_TIME, 0);
+        long timeSinceOverride = System.currentTimeMillis() - overrideTime;
+
+        Boolean locDirection = determineDirectionByLocation(context);
+        if (locDirection != null && timeSinceOverride > 45 * 60 * 1000) { // 45分钟后重新恢复智能位置感知
+            toSchool = locDirection;
+            isGpsDetermined = true;
+            prefs.edit().putBoolean(KEY_TO_SCHOOL, toSchool).apply();
+        } else {
+            toSchool = prefs.getBoolean(KEY_TO_SCHOOL, true);
+        }
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_shuttle);
 
         // 1. Direction Button
-        String toggleText = toSchool ? "去上课 →" : "← 回宿舍";
+        String gpsPrefix = isGpsDetermined ? "📍" : "";
+        String toggleText = toSchool ? (gpsPrefix + "去上课 →") : (gpsPrefix + "← 回宿舍");
         views.setTextViewText(R.id.btn_toggle_dir, toggleText);
 
         Intent toggleIntent = new Intent(context, ShuttleWidgetProvider.class);
