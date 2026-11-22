@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>东南大学接驳车 · 兰台快查</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #3b82f6;
+      --primary-light: #60a5fa;
+      --success: #22c55e;
+      --success-bg: rgba(34,197,94,0.12);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245,158,11,0.12);
+      --error: #ef4444;
+      --error-bg: rgba(239,68,68,0.12);
+      --accent: #8b5cf6;
+      --accent-bg: rgba(139,92,246,0.1);
+      --lantai: #f472b6;
+      --lantai-bg: rgba(244,114,182,0.15);
+      --teaching: #38bdf8;
+      --teaching-bg: rgba(56,189,248,0.12);
+      --campus: #34d399;
+      --campus-bg: rgba(52,211,153,0.12);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    /* ===== Header ===== */
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      padding: 16px 16px 12px;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .header h1 { font-size:18px; font-weight:700; display:flex; align-items:center; gap:6px; }
+    .clock-wrap { text-align:right; }
+    .clock { font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--primary-light); line-height:1.1; }
+    .date-info { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .day-badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:10px; font-weight:600; margin-left:4px; }
+    .day-badge.wd { background:var(--success-bg); color:var(--success); }
+    .day-badge.we { background:var(--warning-bg); color:var(--warning); }
+
+    /* ===== Main Tabs (三大板块) ===== */
+    .main-tabs {
+      display:flex; gap:4px; padding:8px 16px;
+      background: var(--bg);
+      position: sticky; top: 72px; z-index: 90;
+      border-bottom: 1px solid var(--border);
+    }
+    .main-tab {
+      flex:1; padding:8px 4px; border-radius:10px;
+      border:1.5px solid var(--border); background:var(--card);
+      color:var(--text-muted); font-size:12px; font-weight:600;
+      text-align:center; cursor:pointer; transition:all 0.2s;
+    }
+    .main-tab.active { border-color:var(--primary); background:rgba(59,130,246,0.15); color:var(--primary-light); }
+    .main-tab .tab-icon { font-size:16px; display:block; margin-bottom:2px; }
+    .main-tab.lantai-tab.active { border-color:var(--lantai); background:var(--lantai-bg); color:var(--lantai); }
+    .main-tab.campus-tab.active { border-color:var(--campus); background:var(--campus-bg); color:var(--campus); }
+
+    /* ===== Direction Toggle ===== */
+    .dir-row { display:flex; gap:6px; padding:10px 16px; }
+    .dir-btn {
+      flex:1; padding:10px 6px; border-radius:12px;
+      border:2px solid var(--border); background:var(--card);
+      color:var(--text-muted); font-size:13px; font-weight:600;
+      text-align:center; cursor:pointer; transition:all 0.2s; line-height:1.3;
+    }
+    .dir-btn.active { border-color:var(--primary); background:rgba(59,130,246,0.15); color:var(--primary-light); }
+    .dir-btn .arrow { font-size:16px; display:block; margin-bottom:1px; }
+
+    /* ===== Route Filter ===== */
+    .filter-row { display:flex; gap:5px; padding:6px 16px; overflow-x:auto; }
+    .filter-row::-webkit-scrollbar { display:none; }
+    .chip {
+      flex-shrink:0; padding:5px 12px; border-radius:16px;
+      border:1px solid var(--border); background:var(--card);
+      color:var(--text-muted); font-size:11px; font-weight:500;
+      cursor:pointer; transition:all 0.2s; white-space:nowrap;
+    }
+    .chip.active { border-color:var(--primary); background:rgba(59,130,246,0.15); color:var(--primary-light); }
+    .chip.teaching.active { border-color:var(--teaching); background:var(--teaching-bg); color:var(--teaching); }
+
+    /* ===== Content ===== */
+    .content { padding:0 16px 100px; }
+
+    /* Hero Card */
+    .hero {
+      background:linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.15));
+      border:1px solid rgba(59,130,246,0.3); border-radius:16px;
+      padding:18px; margin:12px 0; position:relative; overflow:hidden;
+    }
+    .hero.lantai-hero {
+      background:linear-gradient(135deg, rgba(244,114,182,0.2), rgba(139,92,246,0.15));
+      border-color:rgba(244,114,182,0.3);
+    }
+    .hero-label { font-size:11px; color:var(--text-muted); letter-spacing:0.5px; margin-bottom:6px; }
+    .hero-time { font-size:40px; font-weight:800; color:var(--primary-light); font-variant-numeric:tabular-nums; line-height:1; }
+    .hero.lantai-hero .hero-time { color: var(--lantai); }
+    .hero-route { font-size:13px; color:var(--text); margin-top:6px; }
+    .hero-countdown {
+      display:inline-flex; align-items:center; gap:5px; margin-top:8px;
+      padding:4px 12px; border-radius:16px; font-size:14px; font-weight:700;
+    }
+    .hero-countdown.soon { background:var(--error-bg); color:var(--error); }
+    .hero-countdown.moderate { background:var(--warning-bg); color:var(--warning); }
+    .hero-countdown.plenty { background:var(--success-bg); color:var(--success); }
+    .hero-next-hint { margin-top:8px; font-size:11px; color:var(--text-muted); }
+    .hero-tag {
+      display:inline-block; margin-top:6px; padding:2px 8px; border-radius:8px;
+      font-size:10px; font-weight:600;
+    }
+    .hero-tag.teaching { background:var(--teaching-bg); color:var(--teaching); }
+    .hero-tag.regular { background:rgba(148,163,184,0.15); color:var(--text-muted); }
+
+    .no-bus { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:28px 16px; text-align:center; margin:12px 0; }
+    .no-bus .emoji { font-size:36px; margin-bottom:8px; }
+    .no-bus .msg { font-size:13px; color:var(--text-muted); line-height:1.5; }
+
+    /* Info banner */
+    .info-banner {
+      background:var(--accent-bg); border:1px solid rgba(139,92,246,0.2);
+      border-radius:10px; padding:10px 14px; margin:8px 0;
+      font-size:11px; color:var(--accent); line-height:1.5;
+    }
+
+    /* Section */
+    .section-title { font-size:12px; font-weight:600; color:var(--text-muted); margin:14px 0 6px; display:flex; align-items:center; gap:5px; }
+    .period-div {
+      display:flex; align-items:center; gap:8px; margin:12px 0 6px;
+      font-size:11px; font-weight:600; color:var(--text-dim);
+    }
+    .period-div::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Bus Item */
+    .bus {
+      display:flex; align-items:center; padding:10px 12px; border-radius:10px;
+      margin-bottom:4px; border:1px solid var(--border); background:var(--card);
+      gap:10px; transition:all 0.15s;
+    }
+    .bus.passed { opacity:0.3; background:transparent; border-color:transparent; }
+    .bus.next { border-color:var(--primary); background:rgba(59,130,246,0.08); box-shadow:0 0 16px rgba(59,130,246,0.08); }
+    .bus.next .bus-time { color:var(--primary-light); }
+    .bus-time { font-size:16px; font-weight:700; font-variant-numeric:tabular-nums; min-width:48px; }
+    .bus-info { flex:1; min-width:0; }
+    .bus-route { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .bus-tags { display:flex; gap:3px; margin-top:3px; flex-wrap:wrap; }
+    .tag { padding:1px 6px; border-radius:6px; font-size:9px; font-weight:600; }
+    .tag.teaching { background:var(--teaching-bg); color:var(--teaching); }
+    .tag.regular { background:rgba(148,163,184,0.1); color:var(--text-dim); }
+    .tag.note-tag { background:var(--warning-bg); color:var(--warning); }
+    .bus-status { font-size:11px; font-weight:600; white-space:nowrap; }
+    .bus-status.gone { color:var(--text-dim); }
+    .bus-status.up { color:var(--success); }
+    .bus-status.hot { color:var(--error); animation:pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* Tip bar */
+    .tip-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--card); border-top:1px solid var(--border);
+      padding:8px 16px; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0));
+      font-size:11px; color:var(--text-muted); text-align:center;
+      z-index:50;
+    }
+    .tip-bar a { color:var(--primary-light); text-decoration:none; }
+
+    /* Hide scrollbar globally on mobile */
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  </style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <div class="header-top">
+    <h1>🚌 兰台接驳车快查</h1>
+    <div class="clock-wrap">
+      <div class="clock" id="clock">--:--</div>
+      <div class="date-info" id="dateInfo"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-tabs" id="mainTabs">
+  <div class="main-tab lantai-tab active" data-tab="lantai" onclick="setMainTab('lantai')">
+    <span class="tab-icon">🏠</span>兰台接驳车
+  </div>
+  <div class="main-tab campus-tab" data-tab="campus" onclick="setMainTab('campus')">
+    <span class="tab-icon">🔄</span>校园巴士
+  </div>
+  <div class="main-tab" data-tab="intercampus" onclick="setMainTab('intercampus')">
+    <span class="tab-icon">🚐</span>跨校区大巴
+  </div>
+</div>
+
+<div id="subControls"></div>
+<div class="content" id="content"></div>
+
+<div class="tip-bar">
+  🏫 东南大学九龙湖 · 数据来源：<a href="https://zwc.seu.edu.cn/2025/0609/c60883a531182/page.htm" target="_blank">总务处</a> · 自动刷新
+</div>
+
+<script>
+// =====================================================================
+//  SCHEDULE DATA
+// =====================================================================
+
+// --- 兰台接驳车 ---
+const LANTAI = {
+  // ===== 工作日 =====
+  weekday: {
+    toSchool: [
+      // 早间段 兰台→北门转盘→纪忠楼 循环 07:20-09:40
+      { time:"07:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"07:30", route:"兰台 → 北门转盘 → 纪忠楼", type:"regular", period:"早间", note:"2辆车" },
+      { time:"07:40", route:"兰台 → 北门转盘 → 纪忠楼", type:"regular", period:"早间" },
+      { time:"07:50", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:30", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:50", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:30", route:"兰台 → 北门转盘", type:"regular", period:"早间", note:"2辆车" },
+      { time:"09:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      // 平峰段 常规 兰台→北门转盘
+      { time:"10:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"10:20", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"10:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:10", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"11:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:55", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:10", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:05", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:40", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"14:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"14:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"14:30", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"14:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:30", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"15:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:20", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"16:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:10", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:10", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"17:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:40", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"平峰" },
+      { time:"18:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      // 晚间段
+      { time:"19:10", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"19:30", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"19:30", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"晚间" },
+      { time:"19:45", route:"兰台 → 北门转盘", type:"regular", period:"晚间", note:"南师附中下课，时间有不确定性" },
+      { time:"20:05", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"20:25", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"20:25", route:"兰台 → 北门 → 文学院 → 纪忠楼", type:"teaching", period:"晚间" },
+      { time:"20:45", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:05", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:25", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:45", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"22:05", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"22:15", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"22:25", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+    ],
+    toHome: [
+      // 早间段 纪忠楼/北门→兰台 循环 07:30-09:50
+      { time:"07:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"07:40", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"07:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:00", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:10", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:20", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:40", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:00", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:10", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:20", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:40", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      // 平峰段 常规
+      { time:"10:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"10:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"10:50", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"11:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"11:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"11:40", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"11:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:20", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:30", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"12:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:00", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"15:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:50", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"16:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"16:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"16:50", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"17:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:40", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"17:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:30", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"平峰" },
+      { time:"18:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"19:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      // 晚间段
+      { time:"19:20", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"19:40", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"19:55", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"晚间" },
+      { time:"20:00", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:20", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:40", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:50", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"晚间" },
+      { time:"21:00", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:20", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:40", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:40", route:"纪忠楼 → 文学院 → 北门 → 兰台", type:"teaching", period:"晚间" },
+      { time:"22:00", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:10", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:20", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:30", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+    ],
+  },
+  // ===== 节假日 =====
+  weekend: {
+    toSchool: [
+      { time:"07:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"07:40", route:"兰台 → 北门转盘 → 纪忠楼", type:"regular", period:"早间" },
+      { time:"08:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"08:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      { time:"09:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
+      // 平峰段
+      { time:"10:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"10:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"10:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:10", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"11:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:10", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:30", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"12:50", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"13:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"14:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"14:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"14:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"15:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"16:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"17:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:20", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      { time:"18:40", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
+      // 晚间段
+      { time:"19:00", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"19:20", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"19:35", route:"兰台 → 北门转盘", type:"regular", period:"晚间", note:"南师附中下课，时间有不确定性" },
+      { time:"19:55", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"20:15", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"20:35", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"20:55", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:15", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:35", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"21:55", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"22:15", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+      { time:"22:25", route:"兰台 → 北门转盘", type:"regular", period:"晚间" },
+    ],
+    toHome: [
+      { time:"07:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"07:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:10", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"08:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:10", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:30", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      { time:"09:50", route:"北门转盘 → 兰台", type:"regular", period:"早间" },
+      // 平峰段
+      { time:"10:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"10:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"11:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"11:20", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"11:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:00", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:20", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:40", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"12:55", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"13:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"14:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"15:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"16:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"16:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"16:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"17:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:10", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:30", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      { time:"18:50", route:"北门转盘 → 兰台", type:"regular", period:"平峰" },
+      // 晚间段
+      { time:"19:10", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"19:30", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"19:50", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:10", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:30", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"20:50", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:10", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:30", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"21:50", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:10", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:20", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+      { time:"22:30", route:"北门转盘 → 兰台", type:"regular", period:"晚间" },
+    ],
+  },
+};
+
+// --- 九龙湖校园巴士 ---
+const CAMPUS_BUS = {
+  weekday: [
+    "07:00","07:10","07:20","07:30","07:40","07:45","07:50",
+    "07:55","08:00","08:05","08:10","08:15","08:20","08:25",
+    "08:30","08:35","08:40","08:45","08:50","08:55","09:00",
+    "09:10","09:20","09:30","09:40","09:50","10:00",
+    "10:30","11:00",
+    "11:30","11:40","11:50","12:00","12:10","12:20",
+    "12:30","12:40","12:50","13:00","13:10","13:20",
+    "13:30","14:00",
+    "15:00","15:10","15:20","15:30","15:40","15:50",
+    "16:00",
+    "16:50","16:55","17:00","17:05","17:10",
+    "17:20","17:30","17:40","17:50","18:00","18:10","18:20",
+    "18:30","19:00","19:30","20:00","20:30","21:00",
+    "21:30","22:00","22:30","23:00"
+  ],
+  weekend: [
+    "08:00","08:30","09:00","09:30",
+    "10:30","11:30",
+    "12:00","12:30","13:00",
+    "13:30","14:30","15:30","16:30",
+    "17:00","17:30","18:00","18:30",
+    "19:00","20:00","21:00","22:00","22:30","23:00"
+  ],
+};
+
+// --- 跨校区大巴 ---
+const INTERCAMPUS = {
+  to9: {
+    weekday: [
+      { time:"06:50", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"07:05", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"07:20", from:"四牌楼", to:"九龙湖", lantai:true },
+      { time:"07:20", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"07:30", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"07:40", from:"四牌楼", to:"九龙湖", lantai:true },
+      { time:"08:00", from:"四牌楼", to:"九龙湖", lantai:true },
+      { time:"08:00", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"08:30", from:"四牌楼", to:"九龙湖", lantai:true },
+      { time:"09:30", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"10:10", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"10:10", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"12:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"13:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"13:00", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"13:40", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"14:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"14:00", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"15:50", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"15:50", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"16:40", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"17:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"18:10", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"19:00", from:"四牌楼", to:"九龙湖", lantai:false },
+    ],
+    weekend: [
+      { time:"07:20", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"07:20", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"08:30", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"10:10", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"13:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"14:00", from:"四牌楼", to:"九龙湖", lantai:false },
+      { time:"14:00", from:"丁家桥", to:"九龙湖", lantai:false },
+      { time:"17:00", from:"四牌楼", to:"九龙湖", lantai:false },
+    ],
+  },
+  from9: {
+    weekday: [
+      { time:"07:40", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"07:40", from:"九龙湖", to:"丁家桥", lantai:true },
+      { time:"08:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"10:10", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"10:10", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"11:40", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"12:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"12:00", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"13:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"14:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"14:00", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"15:50", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"16:40", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"17:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"17:00", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"17:30", from:"九龙湖", to:"四牌楼", lantai:true },
+      { time:"17:30", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"18:10", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"19:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"21:00", from:"九龙湖", to:"四牌楼", lantai:true },
+      { time:"21:30", from:"九龙湖", to:"四牌楼", lantai:true },
+    ],
+    weekend: [
+      { time:"08:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"10:10", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"10:10", from:"九龙湖", to:"丁家桥", lantai:false },
+      { time:"12:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"14:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"17:00", from:"九龙湖", to:"四牌楼", lantai:false },
+      { time:"17:00", from:"九龙湖", to:"丁家桥", lantai:false },
+    ],
+  }
+};
+
+// Campus bus restricted times
+const CAMPUS_RESTRICTED = [
+  { start:"09:20", end:"10:00" },
+  { start:"11:20", end:"12:00" },
+  { start:"13:20", end:"14:00" },
+  { start:"15:20", end:"16:00" },
+];
+
+// =====================================================================
+//  STATE
+// =====================================================================
+let mainTab = 'lantai';
+let lantaiDir = 'toSchool'; // toSchool / toHome
+let lantaiFilter = 'all';   // all / teaching / regular
+let icDir = 'to9';          // to9 / from9
+
+// =====================================================================
+//  HELPERS
+// =====================================================================
+function tm(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
+function nowM() { const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+function isWE() { const d=new Date().getDay(); return d===0||d===6; }
+
+function updateClock() {
+  const n=new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  const wd=['日','一','二','三','四','五','六'];
+  const b = isWE()
+    ? '<span class="day-badge we">休息日</span>'
+    : '<span class="day-badge wd">工作日</span>';
+  document.getElementById('dateInfo').innerHTML =
+    `${n.getMonth()+1}月${n.getDate()}日 周${wd[n.getDay()]} ${b}`;
+}
+
+function countdownHtml(diff) {
+  if (diff <= 0) return '<span class="bus-status gone">已过</span>';
+  if (diff <= 10) return `<span class="bus-status hot">${diff}分钟</span>`;
+  if (diff <= 30) return `<span class="bus-status up" style="color:var(--warning)">${diff}分钟</span>`;
+  return `<span class="bus-status up">${diff}分钟</span>`;
+}
+
+function urgency(diff) {
+  if (diff <= 3) return { cls:'soon', txt:'⚡ 快跑！' };
+  if (diff <= 10) return { cls:'soon', txt:'🏃 抓紧！' };
+  if (diff <= 20) return { cls:'moderate', txt:'👌 还来得及' };
+  return { cls:'plenty', txt:'☕ 不着急' };
+}
+
+function periodEmoji(p) {
+  return { '早间':'🌅', '平峰':'☀️', '晚间':'🌙', '上午':'🌅', '中午':'☀️', '下午':'🌇' }[p] || '🕐';
+}
+
+// =====================================================================
+//  MAIN TAB
+// =====================================================================
+function setMainTab(tab) {
+  mainTab = tab;
+  document.querySelectorAll('.main-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  renderSub();
+  render();
+}
+
+// =====================================================================
+//  SUB CONTROLS
+// =====================================================================
+function renderSub() {
+  const el = document.getElementById('subControls');
+  if (mainTab === 'lantai') {
+    el.innerHTML = `
+      <div class="dir-row">
+        <div class="dir-btn ${lantaiDir==='toSchool'?'active':''}" onclick="setLantaiDir('toSchool')">
+          <span class="arrow">→</span>去上课
+        </div>
+        <div class="dir-btn ${lantaiDir==='toHome'?'active':''}" onclick="setLantaiDir('toHome')">
+          <span class="arrow">←</span>回宿舍
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="chip ${lantaiFilter==='all'?'active':''}" onclick="setLantaiFilter('all')">全部班次</div>
+        <div class="chip teaching ${lantaiFilter==='teaching'?'active':''}" onclick="setLantaiFilter('teaching')">📚 教学专线</div>
+        <div class="chip ${lantaiFilter==='regular'?'active':''}" onclick="setLantaiFilter('regular')">🔄 常规线</div>
+      </div>
+    `;
+  } else if (mainTab === 'intercampus') {
+    el.innerHTML = `
+      <div class="dir-row">
+        <div class="dir-btn ${icDir==='to9'?'active':''}" onclick="setIcDir('to9')">
+          <span class="arrow">→</span>去九龙湖
+        </div>
+        <div class="dir-btn ${icDir==='from9'?'active':''}" onclick="setIcDir('from9')">
+          <span class="arrow">←</span>从九龙湖
+        </div>
+      </div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="info-banner" style="margin:8px 16px;">
+        🔄 图书馆北（中央大道）发车，二环循环运行<br>
+        早高峰东北门处约5-8分钟一趟，坐满即走
+      </div>
+    `;
+  }
+}
+
+function setLantaiDir(d) { lantaiDir=d; renderSub(); render(); }
+function setLantaiFilter(f) { lantaiFilter=f; renderSub(); render(); }
+function setIcDir(d) { icDir=d; renderSub(); render(); }
+
+// =====================================================================
+//  RENDER
+// =====================================================================
+function render() {
+  if (mainTab === 'lantai') renderLantai();
+  else if (mainTab === 'campus') renderCampus();
+  else renderIC();
+}
+
+function renderLantai() {
+  const c = document.getElementById('content');
+  const now = nowM();
+  const dayType = isWE() ? 'weekend' : 'weekday';
+  let items = LANTAI[dayType][lantaiDir];
+
+  if (lantaiFilter === 'teaching') items = items.filter(i => i.type === 'teaching');
+  else if (lantaiFilter === 'regular') items = items.filter(i => i.type === 'regular');
+
+  const next = items.find(i => tm(i.time) > now);
+  const next2 = next ? items.find(i => i !== next && tm(i.time) > now) : null;
+
+  let html = '';
+
+  // Hero
+  if (next) {
+    const diff = tm(next.time) - now;
+    const u = urgency(diff);
+    html += `
+      <div class="hero lantai-hero">
+        <div class="hero-label">⏱ ${lantaiDir==='toSchool'?'最近去上课':'最近回宿舍'}</div>
+        <div class="hero-time">${next.time}</div>
+        <div class="hero-route">${next.route}</div>
+        <div class="hero-countdown ${u.cls}">${u.txt} 还有 ${diff} 分钟</div>
+        ${next.type==='teaching'?'<br><span class="hero-tag teaching">📚 教学专线（到纪忠楼）</span>':''}
+        ${next.note?`<br><span class="hero-tag" style="background:var(--warning-bg);color:var(--warning)">⚠️ ${next.note}</span>`:''}
+        ${next2?`<div class="hero-next-hint">再下一班：${next2.time}（${next2.route}）${next2.type==='teaching'?' · 教学专线':''}</div>`:''}
+      </div>
+    `;
+  } else {
+    html += `<div class="no-bus"><div class="emoji">😴</div><div class="msg">今天没有更多班次了<br>明天早点来吧！</div></div>`;
+  }
+
+  // List
+  html += '<div class="section-title">📋 全部班次</div>';
+  let lastP = '';
+  items.forEach(item => {
+    const m = tm(item.time), passed = m <= now;
+    const isN = next && item === next;
+    const diff = m - now;
+    if (item.period !== lastP) {
+      html += `<div class="period-div">${periodEmoji(item.period)} ${item.period}</div>`;
+      lastP = item.period;
+    }
+    let cls = 'bus'; if(passed)cls+=' passed'; if(isN)cls+=' next';
+    let tags = '';
+    if(item.type==='teaching') tags+='<span class="tag teaching">📚 教学专线</span>';
+    if(item.note) tags+=`<span class="tag note-tag">⚠️</span>`;
+
+    html += `<div class="${cls}">
+      <div class="bus-time">${item.time}</div>
+      <div class="bus-info">
+        <div class="bus-route">${item.route}</div>
+        <div class="bus-tags">${tags}</div>
+      </div>
+      ${countdownHtml(diff)}
+    </div>`;
+  });
+  if (!items.length) html += `<div class="no-bus"><div class="emoji">🔍</div><div class="msg">该筛选下没有班次</div></div>`;
+  c.innerHTML = html;
+}
+
+function renderCampus() {
+  const c = document.getElementById('content');
+  const now = nowM();
+  const times = isWE() ? CAMPUS_BUS.weekend : CAMPUS_BUS.weekday;
+  const next = times.find(t => tm(t) > now);
+  const next2 = next ? times.find(t => t !== next && tm(t) > now) : null;
+
+  let html = '';
+  if (next) {
+    const diff = tm(next) - now;
+    const u = urgency(diff);
+    // Check if restricted
+    let restricted = false;
+    for (const r of CAMPUS_RESTRICTED) {
+      if (tm(next) >= tm(r.start) && tm(next) < tm(r.end)) { restricted = true; break; }
+    }
+    html += `
+      <div class="hero">
+        <div class="hero-label">⏱ 下一班校园巴士（图书馆北发车）</div>
+        <div class="hero-time">${next}</div>
+        <div class="hero-route">图书馆北（中央大道）→ 二环循环</div>
+        <div class="hero-countdown ${u.cls}">${u.txt} 还有 ${diff} 分钟</div>
+        ${restricted?'<br><span class="hero-tag" style="background:var(--warning-bg);color:var(--warning)">⚠️ 教学区限行时段，改走绕行路线</span>':''}
+        ${next2?`<div class="hero-next-hint">再下一班：${next2}</div>`:''}
+      </div>
+    `;
+  } else {
+    html += `<div class="no-bus"><div class="emoji">😴</div><div class="msg">今天没有更多校园巴士了</div></div>`;
+  }
+
+  html += '<div class="section-title">📋 全天班次（图书馆北发车）</div>';
+  let lastH = -1;
+  times.forEach(t => {
+    const m = tm(t), passed = m <= now;
+    const isN = t === next, diff = m - now;
+    const h = Math.floor(m / 60);
+    if (h !== lastH) {
+      html += `<div class="period-div">${h < 12 ? '🌅' : h < 18 ? '☀️' : '🌙'} ${h}:00 时段</div>`;
+      lastH = h;
+    }
+    let restricted = false;
+    for (const r of CAMPUS_RESTRICTED) { if (m >= tm(r.start) && m < tm(r.end)) { restricted = true; break; } }
+    let cls = 'bus'; if(passed)cls+=' passed'; if(isN)cls+=' next';
+    let tags = restricted ? '<span class="tag note-tag">绕行</span>' : '';
+    html += `<div class="${cls}">
+      <div class="bus-time">${t}</div>
+      <div class="bus-info">
+        <div class="bus-route">图书馆北 → 二环循环</div>
+        <div class="bus-tags">${tags}</div>
+      </div>
+      ${countdownHtml(diff)}
+    </div>`;
+  });
+  c.innerHTML = html;
+}
+
+function renderIC() {
+  const c = document.getElementById('content');
+  const now = nowM();
+  const dayType = isWE() ? 'weekend' : 'weekday';
+  const items = INTERCAMPUS[icDir][dayType];
+  const next = items.find(i => tm(i.time) > now);
+  const next2 = next ? items.find(i => i !== next && tm(i.time) > now) : null;
+
+  let html = '';
+  if (next) {
+    const diff = tm(next.time) - now;
+    const u = urgency(diff);
+    html += `
+      <div class="hero">
+        <div class="hero-label">⏱ 最近跨校区大巴</div>
+        <div class="hero-time">${next.time}</div>
+        <div class="hero-route">${next.from} → ${next.to}</div>
+        <div class="hero-countdown ${u.cls}">${u.txt} 还有 ${diff} 分钟</div>
+        ${next.lantai?'<br><span class="hero-tag" style="background:var(--lantai-bg);color:var(--lantai)">🏠 经停兰台</span>':''}
+        ${next2?`<div class="hero-next-hint">再下一班：${next2.time}（${next2.from}→${next2.to}）${next2.lantai?' · 经停兰台':''}</div>`:''}
+      </div>
+    `;
+  } else {
+    html += `<div class="no-bus"><div class="emoji">😴</div><div class="msg">今天没有更多跨校区大巴了</div></div>`;
+  }
+
+  html += '<div class="section-title">📋 全部班次</div>';
+  items.forEach(item => {
+    const m = tm(item.time), passed = m <= now;
+    const isN = next && item === next, diff = m - now;
+    let cls = 'bus'; if(passed)cls+=' passed'; if(isN)cls+=' next';
+    let tags = item.lantai ? '<span class="tag" style="background:var(--lantai-bg);color:var(--lantai)">🏠 兰台</span>' : '';
+    html += `<div class="${cls}">
+      <div class="bus-time">${item.time}</div>
+      <div class="bus-info">
+        <div class="bus-route">${item.from} → ${item.to}</div>
+        <div class="bus-tags">${tags}</div>
+      </div>
+      ${countdownHtml(diff)}
+    </div>`;
+  });
+  c.innerHTML = html;
+}
+
+// =====================================================================
+//  INIT
+// =====================================================================
+updateClock(); renderSub(); render();
+setInterval(() => { updateClock(); render(); }, 15000);
+</script>
+</body>
+</html>

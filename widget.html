@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>接驳车小组件</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #0f172a; color: #f1f5f9;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 12px;
+      overflow: hidden;
+    }
+
+    .widget {
+      width: 100%; max-width: 360px;
+      background: linear-gradient(145deg, #1e293b, #162032);
+      border-radius: 24px; padding: 20px;
+      border: 1px solid #334155;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* Top row: title + clock */
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .w-title { font-size: 13px; font-weight: 600; color: #94a3b8; }
+    .w-title .icon { margin-right: 4px; }
+    .w-clock {
+      font-size: 14px; font-weight: 700; color: #60a5fa;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Direction toggle */
+    .dir-toggle {
+      display: flex; gap: 6px; margin-bottom: 16px;
+    }
+    .dir-pill {
+      flex: 1; padding: 8px; border-radius: 12px;
+      background: rgba(255,255,255,0.05); border: 1.5px solid #334155;
+      color: #64748b; font-size: 13px; font-weight: 600;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .dir-pill.active {
+      background: rgba(244,114,182,0.15); border-color: #f472b6; color: #f472b6;
+    }
+
+    /* Next bus section */
+    .next-section { margin-bottom: 12px; }
+    .next-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .next-main {
+      display: flex; align-items: baseline; gap: 10px;
+    }
+    .next-time {
+      font-size: 48px; font-weight: 800; color: #f472b6;
+      font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .next-meta { flex: 1; }
+    .next-route { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    .next-countdown {
+      display: inline-block; padding: 3px 10px; border-radius: 10px;
+      font-size: 13px; font-weight: 700;
+    }
+    .cd-soon { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .cd-mid { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .cd-ok { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .next-tag {
+      display: inline-block; margin-top: 4px; padding: 2px 8px;
+      border-radius: 8px; font-size: 10px; font-weight: 600;
+      background: rgba(56,189,248,0.12); color: #38bdf8;
+    }
+
+    /* Upcoming list */
+    .upcoming {
+      border-top: 1px solid #334155;
+      padding-top: 10px;
+    }
+    .upcoming-title { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .up-row {
+      display: flex; align-items: center; padding: 6px 0;
+      gap: 8px; border-bottom: 1px solid rgba(51,65,85,0.5);
+    }
+    .up-row:last-child { border-bottom: none; }
+    .up-time { font-size: 15px; font-weight: 700; min-width: 44px; font-variant-numeric: tabular-nums; }
+    .up-route { flex: 1; font-size: 11px; color: #94a3b8; }
+    .up-diff { font-size: 11px; font-weight: 600; color: #64748b; }
+    .up-tag { font-size: 9px; padding: 1px 5px; border-radius: 4px; background: rgba(56,189,248,0.12); color: #38bdf8; font-weight: 600; }
+
+    .no-bus-w { text-align: center; padding: 20px 0; }
+    .no-bus-w .emoji { font-size: 32px; }
+    .no-bus-w .msg { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+    /* Link to full app */
+    .full-link {
+      display: block; text-align: center; margin-top: 12px;
+      font-size: 12px; color: #60a5fa; text-decoration: none;
+      padding: 8px; border-radius: 10px;
+      background: rgba(59,130,246,0.08);
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+  <div class="top-row">
+    <div class="w-title"><span class="icon">🚌</span> 兰台接驳车</div>
+    <div class="w-clock" id="wClock">--:--</div>
+  </div>
+  <div class="dir-toggle">
+    <div class="dir-pill active" id="dTo" onclick="setDir('toSchool')">→ 去上课</div>
+    <div class="dir-pill" id="dBack" onclick="setDir('toHome')">← 回宿舍</div>
+  </div>
+  <div id="wContent"></div>
+  <a class="full-link" href="./index.html">查看完整时刻表 →</a>
+</div>
+
+<script>
+// Compact schedule data for widget - lantai only
+const L={weekday:{toSchool:["07:20","07:30","07:40","07:50","08:00","08:10","08:20","08:30","08:40","08:50","09:00","09:10","09:20","09:30","09:40","10:00","10:20T","10:30","11:00","11:10T","11:20","11:40","11:55","12:10","12:20","12:40","12:50","13:05","13:20","13:40T","14:00","14:20","14:30T","14:40","15:00","15:20","15:30T","15:40","16:00","16:20T","16:30","16:50","17:10","17:10T","17:20","17:40","17:50","18:00","18:20","18:30","18:40","18:40T","18:50","19:10","19:30","19:30T","19:45","20:05","20:25","20:25T","20:45","21:05","21:25","21:45","22:05","22:15","22:25"],toHome:["07:30","07:40","07:50","08:00","08:10","08:20","08:30","08:40","08:50","09:00","09:10","09:20","09:30","09:40","09:50","10:10","10:40","10:50T","11:10","11:30","11:40T","11:50","12:00","12:20","12:30","12:30T","12:40","13:00","13:10","13:30","14:10","14:30","14:50","15:00T","15:10","15:30","15:50","15:50T","16:10","16:40","16:50T","17:00","17:10","17:30","17:40","17:40T","17:50","18:00","18:10","18:30","18:30T","18:40","18:50","19:00","19:20","19:40","19:55T","20:00","20:20","20:40","20:50T","21:00","21:20","21:40","21:40T","22:00","22:10","22:20","22:30"]},weekend:{toSchool:["07:20","07:40","08:00","08:20","08:40","09:00","09:20","09:40","10:00","10:30","10:50","11:10","11:30","11:50","12:10","12:30","12:50","13:00","13:20","13:40","14:00","14:20","14:40","15:00","15:20","15:40","16:00","16:20","16:40","17:00","17:20","17:40","18:00","18:20","18:40","19:00","19:20","19:35","19:55","20:15","20:35","20:55","21:15","21:35","21:55","22:15","22:25"],toHome:["07:30","07:50","08:10","08:30","08:50","09:10","09:30","09:50","10:10","10:40","11:00","11:20","11:40","12:00","12:20","12:40","12:55","13:10","13:30","13:50","14:10","14:30","14:50","15:10","15:30","15:50","16:10","16:30","16:50","17:10","17:30","17:50","18:10","18:30","18:50","19:10","19:30","19:50","20:10","20:30","20:50","21:10","21:30","21:50","22:10","22:20","22:30"]}};
+
+let dir='toSchool';
+function tm(s){const[h,m]=s.replace('T','').split(':').map(Number);return h*60+m;}
+function nowM(){const d=new Date();return d.getHours()*60+d.getMinutes();}
+function isWE(){const d=new Date().getDay();return d===0||d===6;}
+
+function setDir(d){
+  dir=d;
+  document.getElementById('dTo').className='dir-pill'+(d==='toSchool'?' active':'');
+  document.getElementById('dBack').className='dir-pill'+(d==='toHome'?' active':'');
+  renderW();
+}
+
+function renderW(){
+  const now=nowM();
+  const n=new Date();
+  document.getElementById('wClock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+
+  const items=L[isWE()?'weekend':'weekday'][dir];
+  const future=items.filter(t=>tm(t)>now);
+  const el=document.getElementById('wContent');
+
+  if(!future.length){
+    el.innerHTML='<div class="no-bus-w"><div class="emoji">😴</div><div class="msg">今天没有更多班次了</div></div>';
+    return;
+  }
+
+  const nxt=future[0];
+  const nxtTime=nxt.replace('T','');
+  const isT=nxt.endsWith('T');
+  const diff=tm(nxt)-now;
+  let cdCls='cd-ok',cdTxt='☕ 不急';
+  if(diff<=5){cdCls='cd-soon';cdTxt='⚡ 快跑！';}
+  else if(diff<=15){cdCls='cd-soon';cdTxt='🏃 抓紧！';}
+  else if(diff<=30){cdCls='cd-mid';cdTxt='👌 还好';}
+
+  let routeLabel=dir==='toSchool'?'兰台 → 北门转盘':'北门转盘 → 兰台';
+  if(isT)routeLabel=dir==='toSchool'?'兰台 → 北门 → 纪忠楼':'纪忠楼 → 北门 → 兰台';
+
+  let html=`
+    <div class="next-section">
+      <div class="next-label">⏱ ${dir==='toSchool'?'最近去上课':'最近回宿舍'}</div>
+      <div class="next-main">
+        <div class="next-time">${nxtTime}</div>
+        <div class="next-meta">
+          <div class="next-route">${routeLabel}</div>
+          <div class="next-countdown ${cdCls}">${cdTxt} ${diff}分钟</div>
+          ${isT?'<div><span class="next-tag">📚 教学专线</span></div>':''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Show next 3 buses
+  const upcoming=future.slice(1,4);
+  if(upcoming.length){
+    html+='<div class="upcoming"><div class="upcoming-title">接下来</div>';
+    upcoming.forEach(t=>{
+      const tt=t.replace('T','');
+      const isTT=t.endsWith('T');
+      const d2=tm(t)-now;
+      let r2=dir==='toSchool'?'→ 北门转盘':'→ 兰台';
+      if(isTT)r2=dir==='toSchool'?'→ 纪忠楼':'→ 兰台(从纪忠楼)';
+      html+=`<div class="up-row">
+        <div class="up-time">${tt}</div>
+        <div class="up-route">${r2} ${isTT?'<span class="up-tag">教学专线</span>':''}</div>
+        <div class="up-diff">${d2}分钟</div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+
+  el.innerHTML=html;
+}
+
+renderW();
+setInterval(renderW,15000);
+</script>
+</body>
+</html>
