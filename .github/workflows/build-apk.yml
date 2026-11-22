@@ -24,16 +24,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
 
       - name: Build Debug APK
         working-directory: ./android
         run: |
-          gradle assembleDebug --no-daemon
+          gradle assembleDebug --stacktrace
 
       - name: Rename APK
         run: |
@@ -47,23 +46,10 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/heads/main')
+        continue-on-error: true
         with:
           tag_name: v1.0.0
           name: "东大兰台接驳车桌面卡片 v1.0"
-          body: |
-            ### 🚌 东南大学兰台接驳车 · 原生桌面卡片安装包
-
-            **安装说明：**
-            1. 下载下方的 `seu-shuttle-widget.apk` 并在手机上安装。
-            2. 回到手机桌面，长按空白处 → 点击「微件 / 卡片」。
-            3. 找到「东大接驳车」，将 4×2 卡片拖到桌面即可！
-
-            **特性：**
-            - 桌面常驻大卡片，解锁手机即见下一班车
-            - 支持「去上课 / 回宿舍」一键切换
-            - 自动区分工作日与节假日班次
-            - 亮屏自刷新，零后台常驻极度省电
           files: seu-shuttle-widget.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
