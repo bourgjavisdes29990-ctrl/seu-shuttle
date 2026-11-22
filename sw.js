@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seu-shuttle-v1';
+const CACHE_NAME = 'seu-shuttle-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -24,8 +24,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network first, fallback to cache
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request)
+      .then(res => {
+        const resClone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, resClone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
