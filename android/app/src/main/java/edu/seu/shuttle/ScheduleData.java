@@ -106,21 +106,22 @@ public class ScheduleData {
                 list.add(new Bus("22:15", "兰台 → 北门转盘", false));
                 list.add(new Bus("22:25", "兰台 → 北门转盘", false));
             } else { // 回宿舍
-                list.add(new Bus("07:30", "北门转盘 → 兰台", false));
-                list.add(new Bus("07:40", "北门转盘 → 兰台", false));
-                list.add(new Bus("07:50", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:00", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:10", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:20", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:30", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:40", "北门转盘 → 兰台", false));
-                list.add(new Bus("08:50", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:00", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:10", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:20", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:30", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:40", "北门转盘 → 兰台", false));
-                list.add(new Bus("09:50", "北门转盘 → 兰台", false));
+                // 早间段 (纪忠楼 → 北门转盘 → 兰台 循环发车 07:30 - 09:50)
+                list.add(new Bus("07:30", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("07:40", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("07:50", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:00", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:10", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:20", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:30", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:40", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("08:50", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:00", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:10", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:20", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:30", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:40", "纪忠楼 → 北门 → 兰台", true));
+                list.add(new Bus("09:50", "纪忠楼 → 北门 → 兰台", true));
                 list.add(new Bus("10:10", "北门转盘 → 兰台", false));
                 list.add(new Bus("10:40", "北门转盘 → 兰台", false));
                 list.add(new Bus("10:50", "纪忠楼 → 北门 → 兰台", true));

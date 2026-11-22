@@ -5,9 +5,12 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="14dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="14dp"
+    android:paddingBottom="12dp">
 
-    <!-- Top Bar: Title & Direction & Jizhonglou Switcher Buttons -->
+    <!-- Top Bar: Title & Open Web Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,9 +26,9 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
-        <!-- Jizhonglou Quick Filter Button -->
+        <!-- Open Web Button -->
         <TextView
-            android:id="@+id/btn_toggle_jizhong"
+            android:id="@+id/btn_open_web"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/pill_btn_bg"
@@ -33,24 +36,49 @@
             android:paddingTop="3dp"
             android:paddingEnd="8dp"
             android:paddingBottom="3dp"
-            android:text="全部"
-            android:textColor="@color/text_secondary"
+            android:text="完整时刻表 🌐"
+            android:textColor="@color/accent_blue"
             android:textSize="11sp"
             android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Controls Bar: Direction & Destination Filter -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <!-- Switch Direction Button -->
         <TextView
             android:id="@+id/btn_toggle_dir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
             android:background="@drawable/pill_btn_bg"
-            android:paddingStart="8dp"
+            android:paddingStart="9dp"
             android:paddingTop="3dp"
-            android:paddingEnd="8dp"
+            android:paddingEnd="9dp"
             android:paddingBottom="3dp"
             android:text="去上课 →"
             android:textColor="@color/accent_pink"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <!-- Destination Filter Button: 全部目的地 / 🏫 纪忠楼 -->
+        <TextView
+            android:id="@+id/btn_toggle_jizhong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/pill_btn_bg"
+            android:paddingStart="9dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="9dp"
+            android:paddingBottom="3dp"
+            android:text="全部目的地"
+            android:textColor="@color/text_secondary"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -63,7 +91,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="4dp">
 
         <!-- Time & Countdown -->
         <LinearLayout
@@ -77,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="08:30"
                 android:textColor="@color/accent_pink"
-                android:textSize="36sp"
+                android:textSize="34sp"
                 android:textStyle="bold"
                 android:includeFontPadding="false" />
 
@@ -87,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:text="还有 12 分钟"
                 android:textColor="@color/badge_ok"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -96,7 +124,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -104,9 +132,9 @@
                 android:id="@+id/tv_route_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="兰台 → 北门转盘"
+                android:text="兰台 → 纪忠楼"
                 android:textColor="@color/text_primary"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -114,18 +142,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="📚 教学专线 (直达纪忠楼)"
+                android:text="📚 直达纪忠楼专线"
                 android:textColor="@color/accent_blue"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/tv_upcoming"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="再下班: 08:40  08:50"
+                android:layout_marginTop="3dp"
+                android:text="接下来: 08:40  08:50"
                 android:textColor="@color/text_secondary"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
 
         </LinearLayout>
 

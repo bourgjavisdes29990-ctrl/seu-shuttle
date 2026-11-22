@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -153,7 +154,7 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.btn_toggle_jizhong, "🏫 纪忠楼");
             views.setTextColor(R.id.btn_toggle_jizhong, Color.parseColor("#38bdf8")); // cyan
         } else {
-            views.setTextViewText(R.id.btn_toggle_jizhong, "全部");
+            views.setTextViewText(R.id.btn_toggle_jizhong, "全部目的地");
             views.setTextColor(R.id.btn_toggle_jizhong, Color.parseColor("#94a3b8")); // muted
         }
 
@@ -164,7 +165,15 @@ public class ShuttleWidgetProvider extends AppWidgetProvider {
         );
         views.setOnClickPendingIntent(R.id.btn_toggle_jizhong, jizhongPending);
 
-        // 3. Whole widget tap = Refresh
+        // 3. Open Web Version Button
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bourgjavisdes29990-ctrl.github.io/seu-shuttle/"));
+        webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent webPending = PendingIntent.getActivity(
+            context, 3, webIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        views.setOnClickPendingIntent(R.id.btn_open_web, webPending);
+
+        // 4. Whole widget tap = Refresh
         Intent refreshIntent = new Intent(context, ShuttleWidgetProvider.class);
         refreshIntent.setAction(ACTION_REFRESH);
         PendingIntent refreshPending = PendingIntent.getBroadcast(
