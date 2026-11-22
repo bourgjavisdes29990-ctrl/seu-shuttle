@@ -49,7 +49,7 @@ public class ScheduleData {
                 list.add(new Bus("09:00", "兰台 → 北门转盘", false));
                 list.add(new Bus("09:10", "兰台 → 北门转盘", false));
                 list.add(new Bus("09:20", "兰台 → 北门转盘", false));
-                list.add(new Bus("09:30", "兰台 → 北门转盘", false));
+                list.add(new Bus("09:30", "兰台 → 北门 → 纪忠楼", true));
                 list.add(new Bus("09:40", "兰台 → 北门转盘", false));
                 // 平峰段
                 list.add(new Bus("10:00", "兰台 → 北门转盘", false));

@@ -208,9 +208,6 @@
   <div class="main-tab campus-tab" data-tab="campus" onclick="setMainTab('campus')">
     <span class="tab-icon">🔄</span>校园巴士
   </div>
-  <div class="main-tab" data-tab="intercampus" onclick="setMainTab('intercampus')">
-    <span class="tab-icon">🚐</span>跨校区大巴
-  </div>
 </div>
 
 <div id="subControls"></div>
@@ -232,8 +229,8 @@ const LANTAI = {
     toSchool: [
       // 早间段 兰台→北门转盘→纪忠楼 循环 07:20-09:40
       { time:"07:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"07:30", route:"兰台 → 北门转盘 → 纪忠楼", type:"regular", period:"早间", note:"2辆车" },
-      { time:"07:40", route:"兰台 → 北门转盘 → 纪忠楼", type:"regular", period:"早间" },
+      { time:"07:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"2辆车" },
+      { time:"07:40", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间" },
       { time:"07:50", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
       { time:"08:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
       { time:"08:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
@@ -244,7 +241,7 @@ const LANTAI = {
       { time:"09:00", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
       { time:"09:10", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
       { time:"09:20", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
-      { time:"09:30", route:"兰台 → 北门转盘", type:"regular", period:"早间", note:"2辆车" },
+      { time:"09:30", route:"兰台 → 北门 → 纪忠楼", type:"teaching", period:"早间", note:"2辆车" },
       { time:"09:40", route:"兰台 → 北门转盘", type:"regular", period:"早间" },
       // 平峰段 常规 兰台→北门转盘
       { time:"10:00", route:"兰台 → 北门转盘", type:"regular", period:"平峰" },
@@ -669,8 +666,8 @@ function renderSub() {
       </div>
       <div class="filter-row">
         <div class="chip ${lantaiFilter==='all'?'active':''}" onclick="setLantaiFilter('all')">全部班次</div>
-        <div class="chip teaching ${lantaiFilter==='teaching'?'active':''}" onclick="setLantaiFilter('teaching')">📚 教学专线</div>
-        <div class="chip ${lantaiFilter==='regular'?'active':''}" onclick="setLantaiFilter('regular')">🔄 常规线</div>
+        <div class="chip teaching ${lantaiFilter==='teaching'?'active':''}" onclick="setLantaiFilter('teaching')">🏫 直达纪忠楼专线</div>
+        <div class="chip ${lantaiFilter==='regular'?'active':''}" onclick="setLantaiFilter('regular')">🔄 仅北门转盘线</div>
       </div>
     `;
   } else if (mainTab === 'intercampus') {

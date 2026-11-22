@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Top Bar: Title & Direction Switcher Button -->
+    <!-- Top Bar: Title & Direction & Jizhonglou Switcher Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,17 +23,33 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
+        <!-- Jizhonglou Quick Filter Button -->
+        <TextView
+            android:id="@+id/btn_toggle_jizhong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/pill_btn_bg"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:text="全部"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
         <!-- Switch Direction Button -->
         <TextView
             android:id="@+id/btn_toggle_dir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
             android:background="@drawable/pill_btn_bg"
-            android:paddingStart="10dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="4dp"
-            android:text="切换方向"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:text="去上课 →"
             android:textColor="@color/accent_pink"
             android:textSize="11sp"
             android:textStyle="bold" />

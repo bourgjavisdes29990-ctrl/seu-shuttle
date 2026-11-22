@@ -16,6 +16,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="edu.seu.shuttle.ACTION_TOGGLE_DIR" />
+                <action android:name="edu.seu.shuttle.ACTION_TOGGLE_JIZHONG" />
                 <action android:name="edu.seu.shuttle.ACTION_REFRESH" />
             </intent-filter>
             <meta-data
